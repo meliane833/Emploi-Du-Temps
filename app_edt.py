@@ -7,6 +7,39 @@ from io import BytesIO
 import base64
 import zipfile
 import json
+import streamlit as st
+
+# PROTECTION PAR MOT DE PASSE
+def check_password():
+    """Retourne True si l'utilisateur a le bon mot de passe."""
+    def password_entered():
+        """Vérifie si le mot de passe est correct."""
+        if st.session_state["password"] == "0035":  # ← Changez ce mot de passe !
+            st.session_state["password_correct"] = True
+            del st.session_state["password"]  # Ne pas stocker le mot de passe
+        else:
+            st.session_state["password_correct"] = False
+
+    if "password_correct" not in st.session_state:
+        # Premier affichage, afficher le champ de mot de passe.
+        st.text_input(
+            "🔒 Mot de passe", type="password", on_change=password_entered, key="password"
+        )
+        st.write("*Veuillez contacter l'administrateur pour obtenir l'accès*")
+        return False
+    elif not st.session_state["password_correct"]:
+        # Mot de passe incorrect, afficher à nouveau le champ + erreur.
+        st.text_input(
+            "🔒 Mot de passe", type="password", on_change=password_entered, key="password"
+        )
+        st.error("😕 Mot de passe incorrect")
+        return False
+    else:
+        # Mot de passe correct.
+        return True
+
+if not check_password():
+    st.stop()  # Arrête l'exécution si mauvais mot de passe
 
 # Configuration des heures de cours par matière et par niveau selon vos spécifications
 MATIERES_HEURES = {
@@ -775,4 +808,5 @@ def main():
             st.info("👈 Générer d'abord les emplois du temps dans l'onglet Gestion")
 
 if __name__ == "__main__":
+
     main()
