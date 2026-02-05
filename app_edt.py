@@ -7,39 +7,6 @@ from io import BytesIO
 import base64
 import zipfile
 import json
-import streamlit as st
-
-# PROTECTION PAR MOT DE PASSE
-def check_password():
-    """Retourne True si l'utilisateur a le bon mot de passe."""
-    def password_entered():
-        """Vérifie si le mot de passe est correct."""
-        if st.session_state["password"] == "0035":  # ← Changez ce mot de passe !
-            st.session_state["password_correct"] = True
-            del st.session_state["password"]  # Ne pas stocker le mot de passe
-        else:
-            st.session_state["password_correct"] = False
-
-    if "password_correct" not in st.session_state:
-        # Premier affichage, afficher le champ de mot de passe.
-        st.text_input(
-            "🔒 Mot de passe", type="password", on_change=password_entered, key="password"
-        )
-        st.write("*Veuillez contacter l'administrateur pour obtenir l'accès*")
-        return False
-    elif not st.session_state["password_correct"]:
-        # Mot de passe incorrect, afficher à nouveau le champ + erreur.
-        st.text_input(
-            "🔒 Mot de passe", type="password", on_change=password_entered, key="password"
-        )
-        st.error("😕 Mot de passe incorrect")
-        return False
-    else:
-        # Mot de passe correct.
-        return True
-
-if not check_password():
-    st.stop()  # Arrête l'exécution si mauvais mot de passe
 
 # Configuration des heures de cours par matière et par niveau selon vos spécifications
 MATIERES_HEURES = {
@@ -106,13 +73,13 @@ HORAIRES = [
     ("07:30", "08:25"),
     ("08:25", "09:20"),
     ("09:20", "10:15"),
-    ("10:15", "10:30"),  # Récréation (bloqué)
+    ("10:15", "10:30"),  
     ("10:30", "11:25"),
     ("11:25", "12:20"),
     ("12:20", "13:30"),  # Pause déjeuner (bloqué)
     ("13:30", "14:25"),
     ("14:25", "15:20"),
-    ("15:20", "15:35"),  # Récréation (bloqué)
+    ("15:20", "15:35"), 
     ("15:35", "16:30"),
     ("16:30", "17:25")
 ]
@@ -121,7 +88,7 @@ JOURS = ["LUNDI", "MARDI", "MERCREDI", "JEUDI", "VENDREDI"]
 
 MAX_HEURES_PAR_PROF = 21  # limite 21h par semaine
 MAX_MATIERES_PAR_JOUR = 3  # Maximum 3 matières différentes par jour
-BLOQUE_INDICES = (3, 6, 9)  # indices à ne pas utiliser (récréations / pause)
+BLOQUE_INDICES =(6,9) # indices à ne pas utiliser (récréations / pause)
 
 class GenerateurEmploiDuTemps:
     def __init__(self):
@@ -251,7 +218,7 @@ class GenerateurEmploiDuTemps:
                 indices = list(range(start, start + heures_necessaires))
                 
                 # Vérifier la validité du créneau
-                if any(idx in BLOQUE_INDICES for idx in indices):
+                if any(idx == BLOQUE_INDICES for idx in indices):
                     continue
                 if not all(self.creneau_libre_prof(prof, jour, idx) for idx in indices):
                     continue
@@ -808,5 +775,4 @@ def main():
             st.info("👈 Générer d'abord les emplois du temps dans l'onglet Gestion")
 
 if __name__ == "__main__":
-
     main()
